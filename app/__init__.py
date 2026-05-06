@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
 def create_app():
 
     app = Flask(__name__)
@@ -28,17 +29,23 @@ def create_app():
     # 🌾 ENSURE UPLOAD FOLDER EXISTS
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
-    # ⚠️ FIXED IMPORT ORDER (safer for Render)
     with app.app_context():
 
-        # 🌿 IMPORT MODELS FIRST (avoid circular issues)
+        # 🌿 IMPORT MODELS (avoid circular import)
         from app import models  # noqa: F401
 
         # 🚜 REGISTER ROUTES
         from app.routes import main
         app.register_blueprint(main)
 
-        # ⚠️ IMPORTANT: only for dev (safe fallback for Render free tier)
+        # ⚠️ DEV ONLY (safe fallback)
         db.create_all()
 
     return app
+
+
+# ----------------------------------------------------
+# 🚨 CRITICAL FIX FOR RENDER / GUNICORN
+# ----------------------------------------------------
+# This exposes "app:app" for Render
+app = create_app()
