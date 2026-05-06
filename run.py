@@ -1,7 +1,7 @@
 import os
 from app import create_app
 
-# 🚀 Create app (used by Render / Gunicorn)
+# 🚀 Create Flask app (used by Render / Gunicorn)
 app = create_app()
 
 
@@ -10,7 +10,7 @@ def get_bool_env(key, default=False):
     return os.environ.get(key, str(default)).lower() in ("1", "true", "yes")
 
 
-# ✅ ONLY run locally (Render will NOT execute this)
+# ✅ Local development only
 if __name__ == "__main__":
 
     port = int(os.environ.get("PORT", 5000))
@@ -27,5 +27,5 @@ if __name__ == "__main__":
         host=host,
         port=port,
         debug=debug,
-        use_reloader=debug
+        use_reloader=False  # ✅ FIX: safer for dev + prevents double loading
     )

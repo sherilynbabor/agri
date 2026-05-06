@@ -33,7 +33,7 @@ class Crop(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
-    # ✅ FIX: safer datetime handling for production
+    # ✅ FIX: safer default datetime (important for production)
     date_planted = db.Column(
         db.DateTime,
         default=lambda: datetime.utcnow()
@@ -60,7 +60,7 @@ class Crop(db.Model):
         if not self.harvest_date:
             return 0
 
-        # ✅ FIX: safe UTC handling
+        # ⚠️ FIX: safer comparison logic (prevents negative weird values)
         delta = self.harvest_date - datetime.utcnow()
         return max(delta.days, 0)
 

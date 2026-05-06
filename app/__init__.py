@@ -28,17 +28,17 @@ def create_app():
     # 🌾 ENSURE UPLOAD FOLDER EXISTS
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
-    # ⚠️ FIX: avoid circular import issues (safe import order)
+    # ⚠️ FIXED IMPORT ORDER (safer for Render)
     with app.app_context():
 
-        # 🌿 IMPORT MODELS FIRST
-        from app import models
+        # 🌿 IMPORT MODELS FIRST (avoid circular issues)
+        from app import models  # noqa: F401
 
         # 🚜 REGISTER ROUTES
         from app.routes import main
         app.register_blueprint(main)
 
-        # ⚠️ WARNING: only OK for dev (Render may reset DB)
+        # ⚠️ IMPORTANT: only for dev (safe fallback for Render free tier)
         db.create_all()
 
     return app

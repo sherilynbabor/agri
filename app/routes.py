@@ -34,13 +34,9 @@ def preprocess_image(path):
         print("❌ Image failed to load")
         return None
 
-    print("Original shape:", img.shape)
-
     img = cv2.resize(img, (224, 224))
     img = img / 255.0
     img = np.expand_dims(img, axis=0)
-
-    print("Processed shape:", img.shape)
 
     return img
 
@@ -59,6 +55,7 @@ def home():
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+
         username = request.form['username']
         password = request.form['password']
 
@@ -86,6 +83,7 @@ def register():
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+
         username = request.form['username']
         password = request.form['password']
 
@@ -161,7 +159,7 @@ def add_crop():
 
 
 # -------------------------
-# SCANNER (FIXED FOR DEPLOYMENT)
+# SCANNER (DEPLOY SAFE FIXED)
 # -------------------------
 @main.route('/scanner', methods=['GET', 'POST'])
 def scanner():
@@ -177,6 +175,7 @@ def scanner():
     image_file = None
 
     if request.method == 'POST':
+
         image = request.files.get('image')
 
         if not image or image.filename == '':
@@ -189,16 +188,15 @@ def scanner():
         filepath = os.path.join(upload_path, filename)
         image.save(filepath)
 
-        print("✅ Image saved:", filepath)
-
         img = preprocess_image(filepath)
 
         # -------------------------
-        # SAFE MODEL HANDLING (FIXED)
+        # SAFE MODEL HANDLING
         # -------------------------
         model = getattr(current_app, "model", None)
 
         if img is not None and model:
+
             try:
                 pred = model.predict(img)
 
@@ -223,12 +221,10 @@ def scanner():
                 }
 
         else:
-            print("⚠️ Model not available in deployment")
-
             result = {
                 "status": "Model Disabled",
                 "confidence": "0%",
-                "message": "AI model not loaded on server"
+                "message": "AI model not available on server"
             }
 
         image_file = filename
