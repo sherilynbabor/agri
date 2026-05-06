@@ -1,7 +1,7 @@
 import os
 from app import create_app
 
-# 🚀 Render will use this
+# 🚀 Create app (used by Render / Gunicorn)
 app = create_app()
 
 
@@ -10,9 +10,9 @@ def get_bool_env(key, default=False):
     return os.environ.get(key, str(default)).lower() in ("1", "true", "yes")
 
 
+# ✅ ONLY run locally (Render will NOT execute this)
 if __name__ == "__main__":
 
-    # 🌿 ENV CONFIG (safe + flexible)
     port = int(os.environ.get("PORT", 5000))
     host = os.environ.get("HOST", "0.0.0.0")
     debug = get_bool_env("FLASK_DEBUG", True)
@@ -23,11 +23,9 @@ if __name__ == "__main__":
     print(f"🐞 Debug: {debug}")
     print("📸 AI Scanner: Ready\n")
 
-    # 🚀 RUN APP
     app.run(
         host=host,
         port=port,
         debug=debug,
-        use_reloader=debug,
-        threaded=True
+        use_reloader=debug
     )
