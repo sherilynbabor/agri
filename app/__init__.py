@@ -8,11 +8,11 @@ def create_app():
 
     app = Flask(__name__)
 
-    # 🌿 CONFIGURATION (UPDATED)
+    # 🌿 CONFIGURATION (DEPLOY SAFE)
     app.config.update(
         SECRET_KEY=os.environ.get("SECRET_KEY", "dev-secret-key"),
 
-        # ✅ FIX: allow Render DB (fallback to SQLite)
+        # ✅ Render-safe DB config
         SQLALCHEMY_DATABASE_URI=os.environ.get(
             "DATABASE_URL",
             "sqlite:///agriyu.db"
@@ -28,15 +28,17 @@ def create_app():
     # 🌾 ENSURE UPLOAD FOLDER EXISTS
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
-    # 🌿 IMPORT MODELS
-    from app import models
-
-    # 🚜 REGISTER ROUTES
-    from app.routes import main
-    app.register_blueprint(main)
-
-    # ⚠️ STILL OK FOR NOW (dev)
+    # ⚠️ FIX: avoid circular import issues (safe import order)
     with app.app_context():
+
+        # 🌿 IMPORT MODELS FIRST
+        from app import models
+
+        # 🚜 REGISTER ROUTES
+        from app.routes import main
+        app.register_blueprint(main)
+
+        # ⚠️ WARNING: only OK for dev (Render may reset DB)
         db.create_all()
 
     return app

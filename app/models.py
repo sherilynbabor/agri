@@ -33,7 +33,12 @@ class Crop(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
-    date_planted = db.Column(db.DateTime, default=datetime.utcnow)
+    # ✅ FIX: safer datetime handling for production
+    date_planted = db.Column(
+        db.DateTime,
+        default=lambda: datetime.utcnow()
+    )
+
     days_to_harvest = db.Column(db.Integer, default=60)
 
     # 🤖 AI DETECTION FIELDS
@@ -54,6 +59,8 @@ class Crop(db.Model):
     def remaining_days(self):
         if not self.harvest_date:
             return 0
+
+        # ✅ FIX: safe UTC handling
         delta = self.harvest_date - datetime.utcnow()
         return max(delta.days, 0)
 
@@ -68,7 +75,7 @@ class Crop(db.Model):
         return max(0, min(100, progress))
 
     # -------------------------
-    # 🤖 HELPER METHOD (NEW)
+    # 🤖 HELPER METHOD
     # -------------------------
     def update_scan(self, disease, confidence):
         """

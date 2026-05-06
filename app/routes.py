@@ -36,7 +36,7 @@ def preprocess_image(path):
 
     print("Original shape:", img.shape)
 
-    img = cv2.resize(img, (224, 224))  # MUST match training
+    img = cv2.resize(img, (224, 224))
     img = img / 255.0
     img = np.expand_dims(img, axis=0)
 
@@ -130,11 +130,10 @@ def add_crop():
     image = request.files.get('image')
 
     filename = None
-
     upload_path = current_app.config["UPLOAD_FOLDER"]
 
     if image and image.filename:
-        filename = str(uuid.uuid4()) + "_" + secure_filename(image.filename)
+        filename = f"{uuid.uuid4()}_{secure_filename(image.filename)}"
         image.save(os.path.join(upload_path, filename))
 
     CROP_DAYS = {
@@ -162,7 +161,7 @@ def add_crop():
 
 
 # -------------------------
-# SCANNER (FIXED)
+# SCANNER (FIXED FOR DEPLOYMENT)
 # -------------------------
 @main.route('/scanner', methods=['GET', 'POST'])
 def scanner():
@@ -186,39 +185,50 @@ def scanner():
 
         upload_path = current_app.config["UPLOAD_FOLDER"]
 
-        filename = str(uuid.uuid4()) + "_" + secure_filename(image.filename)
+        filename = f"{uuid.uuid4()}_{secure_filename(image.filename)}"
         filepath = os.path.join(upload_path, filename)
         image.save(filepath)
 
         print("✅ Image saved:", filepath)
 
-        # PREPROCESS
         img = preprocess_image(filepath)
 
-        # ✅ SAFE MODEL ACCESS (NO ERROR)
+        # -------------------------
+        # SAFE MODEL HANDLING (FIXED)
+        # -------------------------
         model = getattr(current_app, "model", None)
 
-        if img is not None and model is not None:
-            pred = model.predict(img)
+        if img is not None and model:
+            try:
+                pred = model.predict(img)
 
-            print("🔍 Raw prediction:", pred)
+                class_index = int(np.argmax(pred))
+                confidence = float(np.max(pred))
 
-            class_index = int(np.argmax(pred))
-            confidence = float(np.max(pred))
+                CLASSES = ["Healthy 🌱", "Blight 🍂", "Rust 🦠"]
 
-            CLASSES = ["Healthy 🌱", "Blight 🍂", "Rust 🦠"]
+                result = {
+                    "status": CLASSES[class_index],
+                    "confidence": f"{confidence * 100:.2f}%",
+                    "message": "Detection successful"
+                }
 
-            result = {
-                "status": CLASSES[class_index],
-                "confidence": f"{confidence * 100:.2f}%",
-                "message": "Detection successful"
-            }
+            except Exception as e:
+                print("❌ Prediction error:", e)
+
+                result = {
+                    "status": "Error",
+                    "confidence": "0%",
+                    "message": "Model prediction failed"
+                }
+
         else:
-            print("⚠️ Model or image missing")
+            print("⚠️ Model not available in deployment")
+
             result = {
-                "status": "Error",
+                "status": "Model Disabled",
                 "confidence": "0%",
-                "message": "Model not loaded or invalid image"
+                "message": "AI model not loaded on server"
             }
 
         image_file = filename
@@ -247,11 +257,8 @@ def settings():
         return redirect(url_for('main.login'))
 
     if request.method == 'POST':
-        theme = request.form.get('theme')
-        notifications = request.form.get('notifications')
-
-        session['theme'] = theme
-        session['notifications'] = notifications
+        session['theme'] = request.form.get('theme')
+        session['notifications'] = request.form.get('notifications')
 
         flash("Settings saved successfully 🌿", "success")
         return redirect(url_for('main.settings'))
@@ -265,7 +272,7 @@ def settings():
 
 
 # -------------------------
-# OTHER PAGES
+# OTHER PAGES (UNCHANGED)
 # -------------------------
 @main.route('/fields')
 def fields():
