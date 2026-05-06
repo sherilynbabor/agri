@@ -1,7 +1,7 @@
 import os
 from app import create_app
 
-# 🚀 Create Flask app
+# 🚀 Render will use this
 app = create_app()
 
 
