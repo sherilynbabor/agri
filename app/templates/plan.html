@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Planting Plan - AgriYu Farm</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+  background: #f5f3ea;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+</style>
+</head>
+
+<body class="p-8">
+
+<h1 class="text-3xl font-bold mb-2">📅 Planting Plan</h1>
+<p class="text-gray-600 mb-6">Plan and schedule your crops 🌾</p>
+
+<!-- ADD PLAN FORM -->
+<div class="card mb-6">
+
+  <form method="POST" action="{{ url_for('main.add_crop') }}" enctype="multipart/form-data">
+
+    <input type="text" name="name" placeholder="Crop name"
+           class="w-full p-2 border rounded mb-2" required>
+
+    <select name="growth_stage" class="w-full p-2 border rounded mb-2">
+      <option>Seed 🌱</option>
+      <option>Sprout 🌿</option>
+      <option>Vegetative 🌾</option>
+      <option>Flowering 🌸</option>
+      <option>Harvest 🌽</option>
+    </select>
+
+    <button type="submit"
+            class="bg-green-700 text-white px-4 py-2 rounded w-full">
+      + Add to Plan
+    </button>
+
+  </form>
+
+</div>
+
+<!-- PLAN LIST -->
+<div class="grid gap-4">
+
+  {% for crop in crops %}
+
+  <div class="card">
+
+    <h2 class="text-xl font-bold">🌱 {{ crop.name }}</h2>
+    <p class="text-gray-600">Stage: {{ crop.growth_stage }}</p>
+
+    <p class="text-sm text-gray-500 mt-2">
+      📅 Planted: {{ crop.date_planted.strftime('%Y-%m-%d') }}
+    </p>
+
+    <p class="text-sm text-gray-500">
+      🌾 Days to harvest: {{ crop.days_to_harvest }}
+    </p>
+
+    <p class="text-sm text-green-700 font-semibold mt-2">
+      🚜 Harvest date: {{ (crop.date_planted + timedelta(days=crop.days_to_harvest)).strftime('%Y-%m-%d') }}
+    </p>
+
+  </div>
+
+  {% else %}
+    <p class="text-gray-500">No planting plans yet 🌱</p>
+  {% endfor %}
+
+</div>
+
+</body>
+</html>

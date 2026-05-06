@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Harvest Stats - AgriYu Farm</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+  background: #f5f3ea;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+</style>
+</head>
+
+<body class="p-8">
+
+<h1 class="text-3xl font-bold mb-2">📊 Harvest Stats</h1>
+<p class="text-gray-600 mb-6">Overview of your farm performance 🌾</p>
+
+
+<div class="grid grid-cols-3 gap-4 mb-6">
+
+  <div class="card">
+    <p class="text-gray-500">Total Crops</p>
+    <h2 class="text-2xl font-bold">{{ crops|length }}</h2>
+  </div>
+
+  <div class="card">
+    <p class="text-gray-500">Avg Days to Harvest</p>
+    <h2 class="text-2xl font-bold">
+      {% if crops %}
+        {{ (crops|sum(attribute='days_to_harvest') / crops|length)|round(0) }}
+      {% else %}
+        0
+      {% endif %}
+    </h2>
+  </div>
+
+  <div class="card">
+    <p class="text-gray-500">Ready Soon</p>
+    <h2 class="text-2xl font-bold text-green-600">
+      {% set ready = 0 %}
+      {% for crop in crops %}
+        {% if crop.days_to_harvest <= 30 %}
+          {% set ready = ready + 1 %}
+        {% endif %}
+      {% endfor %}
+      {{ ready }}
+    </h2>
+  </div>
+
+</div>
+
+
+<div class="card">
+
+  <h2 class="text-xl font-bold mb-4">🌾 Crop Details</h2>
+
+  {% for crop in crops %}
+
+    <div class="border-b py-2">
+
+      <p class="font-semibold">🌱 {{ crop.name }}</p>
+
+      <p class="text-sm text-gray-600">
+        Stage: {{ crop.growth_stage }}
+      </p>
+
+      <p class="text-sm text-gray-600">
+        Days to harvest: {{ crop.days_to_harvest }}
+      </p>
+
+    </div>
+
+  {% else %}
+    <p class="text-gray-500">No crops available 🌱</p>
+  {% endfor %}
+
+</div>
+
+</body>
+</html>

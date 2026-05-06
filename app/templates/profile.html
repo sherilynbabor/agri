@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AgriYu - Profile</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* 🌾 FARM BACKGROUND */
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(255,255,255,0.6)),
+    url("https://images.unsplash.com/photo-1464226184884-fa280b87c399");
+
+  background-size: cover;
+  background-position: center;
+}
+
+/* 🌿 CARD */
+.card {
+  width: 430px;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(12px);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(70, 50, 20, 0.18);
+  position: relative;
+}
+
+/* 🌱 DECOR */
+.card::before {
+  content: "🌿";
+  font-size: 70px;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  opacity: 0.12;
+}
+
+/* 🌾 TITLE */
+h2 {
+  text-align: center;
+  color: #2d6a4f;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 13px;
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+
+.avatar {
+  text-align: center;
+  font-size: 52px;
+  margin-bottom: 10px;
+}
+
+/* 🌾 INPUT */
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #cce3de;
+  border-radius: 10px;
+  background: #f8f9fa;
+}
+
+input:focus {
+  border-color: #2d6a4f;
+  outline: none;
+  background: white;
+}
+
+/* 🌽 BUTTON */
+button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #2d6a4f, #40916c);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+/* 🌼 FLASH */
+.flash {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.flash.error { background: #ffd6d6; color: #b00020; }
+.flash.success { background: #d8f3dc; color: #1b4332; }
+
+.back {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  color: #2d6a4f;
+  text-decoration: none;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <div class="avatar">🧑‍🌾</div>
+
+  <h2>Farmer Profile</h2>
+  <div class="subtitle">Manage your AgriYu account 🌾</div>
+
+  <!-- FLASH -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <!-- FORM -->
+  <form method="POST" action="{{ url_for('main.profile') }}">
+
+    <input type="text" name="username"
+           value="{{ user.username }}"
+           placeholder="🌱 Username" required>
+
+    <input type="password" id="password" name="password"
+           placeholder="🔒 New Password (optional)">
+
+    <input type="password" id="confirm" name="confirm"
+           placeholder="🔒 Confirm Password">
+
+    <button type="submit">🌿 Update Profile</button>
+  </form>
+
+  <a class="back" href="{{ url_for('main.dashboard') }}">
+    ⬅ Back to Dashboard
+  </a>
+
+</div>
+
+<script>
+document.querySelector("form").onsubmit = function () {
+  const pass = document.getElementById("password").value;
+  const confirm = document.getElementById("confirm").value;
+
+  // only check if user typed password
+  if (pass && pass !== confirm) {
+    alert("Passwords do not match!");
+    return false;
+  }
+  return true;
+};
+</script>
+
+</body>
+</html>

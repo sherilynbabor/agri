@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AgriYu Farm Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+.farm-bg {
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.2),
+    rgba(255,255,255,0.6)
+  ),
+  url("https://images.unsplash.com/photo-1500595046743-cd271d694d30?q=80&w=2070&auto=format&fit=crop");
+  background-size: cover;
+  background-position: center;
+}
+
+.glass {
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(10px);
+}
+
+.rust-shadow {
+  box-shadow: 0 10px 25px rgba(70, 50, 20, 0.15);
+}
+</style>
+</head>
+
+<body class="farm-bg font-sans">
+
+<div class="flex h-screen">
+
+  <!-- 🌾 SIDEBAR -->
+  <aside class="w-64 bg-[#5a3e1b]/95 text-white flex flex-col p-6 rust-shadow">
+
+    <h1 class="text-2xl font-bold mb-10">🚜 AgriYu Farm</h1>
+
+    <nav class="space-y-3 text-sm">
+
+      <a href="{{ url_for('main.dashboard') }}"
+         class="block px-4 py-2 rounded-lg {% if request.endpoint == 'main.dashboard' %}bg-[#7a5224]{% else %}hover:bg-[#6a4720]{% endif %}">
+         🏡 Home Barn
+      </a>
+
+      <a href="{{ url_for('main.fields') }}"
+         class="block px-4 py-2 rounded-lg {% if request.endpoint == 'main.fields' %}bg-[#7a5224]{% else %}hover:bg-[#6a4720]{% endif %}">
+         🌱 Fields
+      </a>
+
+      <a href="{{ url_for('main.scanner') }}"
+         class="block px-4 py-2 rounded-lg {% if request.endpoint == 'main.scanner' %}bg-[#7a5224]{% else %}hover:bg-[#6a4720]{% endif %}">
+         📸 Crop Scanner
+      </a>
+
+      <a href="{{ url_for('main.stats') }}"
+         class="block px-4 py-2 rounded-lg {% if request.endpoint == 'main.stats' %}bg-[#7a5224]{% else %}hover:bg-[#6a4720]{% endif %}">
+         📊 Harvest Stats
+      </a>
+
+      <a href="{{ url_for('main.plan') }}"
+         class="block px-4 py-2 rounded-lg {% if request.endpoint == 'main.plan' %}bg-[#7a5224]{% else %}hover:bg-[#6a4720]{% endif %}">
+         📅 Planting Plan
+      </a>
+
+      <a href="{{ url_for('main.settings') }}"
+         class="block px-4 py-2 rounded-lg {% if request.endpoint == 'main.settings' %}bg-[#7a5224]{% else %}hover:bg-[#6a4720]{% endif %}">
+         ⚙️ Settings
+      </a>
+
+      <a href="{{ url_for('main.profile') }}"
+         class="block px-4 py-2 rounded-lg {% if request.endpoint == 'main.profile' %}bg-[#7a5224]{% else %}hover:bg-[#6a4720]{% endif %}">
+         👨‍🌾 Profile
+      </a>
+
+      <a href="{{ url_for('main.logout') }}"
+         class="block px-4 py-2 rounded-lg bg-red-700 hover:bg-red-800">
+         🚪 Logout
+      </a>
+
+    </nav>
+
+    <div class="mt-auto bg-[#7a5224] p-3 rounded-xl text-center">
+      <p class="text-sm font-semibold">
+        {{ user.username if user else "Guest Farmer" }}
+      </p>
+      <p class="text-xs text-yellow-200">Farm Owner</p>
+    </div>
+
+  </aside>
+
+  <!-- 🌾 MAIN -->
+  <main class="flex-1 p-8 overflow-y-auto">
+
+    <!-- HEADER -->
+    <div class="mb-8">
+      <h2 class="text-3xl font-bold text-[#3b2a14]">
+        🌤 Welcome back, {{ user.username if user else "Farmer" }}
+      </h2>
+      <p class="text-[#5a4a33]">Your fields are growing strong today.</p>
+    </div>
+
+    <!-- STATS -->
+    <div class="grid grid-cols-4 gap-6 mb-8">
+
+      <div class="glass p-5 rounded-2xl rust-shadow">
+        <p class="text-sm">🌾 Crops Growing</p>
+        <h3 class="text-3xl font-bold text-green-700">{{ crops|length }}</h3>
+      </div>
+
+      <div class="glass p-5 rounded-2xl rust-shadow">
+        <p class="text-sm">🚜 Fields</p>
+        <h3 class="text-3xl font-bold text-yellow-700">3</h3>
+      </div>
+
+      <div class="glass p-5 rounded-2xl rust-shadow">
+        <p class="text-sm">⚠ Alerts</p>
+        <h3 class="text-3xl font-bold text-red-600">2</h3>
+      </div>
+
+      <div class="glass p-5 rounded-2xl rust-shadow">
+        <p class="text-sm">🌤 Weather</p>
+        <h3 class="text-3xl font-bold">30°C ☀️</h3>
+      </div>
+
+    </div>
+
+    <!-- CROPS -->
+    <div class="grid grid-cols-3 gap-6">
+
+      <div class="col-span-2 glass p-6 rounded-2xl rust-shadow">
+
+        <h3 class="font-bold text-lg text-[#3b2a14] mb-6">
+          🌾 Field Growth
+        </h3>
+
+        <!-- ADD CROP FORM -->
+        <form method="POST"
+              action="{{ url_for('main.add_crop') }}"
+              enctype="multipart/form-data"
+              class="mb-6 bg-white p-4 rounded-xl shadow">
+
+          <input type="text" name="name" placeholder="Crop name"
+                 class="w-full p-2 border rounded mb-2" required>
+
+          <select name="growth_stage"
+                  class="w-full p-2 border rounded mb-2">
+            <option>Seed 🌱</option>
+            <option>Sprout 🌿</option>
+            <option>Vegetative 🌾</option>
+            <option>Flowering 🌸</option>
+            <option>Harvest 🌽</option>
+          </select>
+
+          <input type="file" name="image" accept="image/*"
+                 class="w-full p-2 border rounded mb-2">
+
+          <button type="submit"
+                  class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 w-full">
+            + Add Crop
+          </button>
+
+        </form>
+
+        <!-- CROPS LIST -->
+        {% for crop in crops %}
+
+        <div class="mb-6 bg-white p-3 rounded-xl shadow">
+
+          {% if crop.image %}
+            <img src="{{ url_for('static', filename='uploads/' + crop.image) }}"
+                 class="w-full h-40 object-cover rounded-lg mb-2">
+          {% else %}
+            <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-lg mb-2">
+              🌾 No Image
+            </div>
+          {% endif %}
+
+          <p class="font-medium text-lg">🌱 {{ crop.name }}</p>
+          <p class="text-sm text-gray-600">{{ crop.growth_stage }}</p>
+
+          <!-- ✅ CLEAN PROGRESS (FROM MODEL) -->
+          <div class="bg-gray-200 h-3 rounded-full mt-2">
+            <div class="bg-green-600 h-3 rounded-full"
+                 style="width: {{ crop.progress }}%">
+            </div>
+          </div>
+
+          <p class="text-sm text-gray-500 mt-1">
+            🌾 {{ crop.remaining_days }} days remaining
+          </p>
+
+        </div>
+
+        {% else %}
+          <p class="text-gray-500 text-center">No crops yet 🌱</p>
+        {% endfor %}
+
+      </div>
+
+      <!-- WEATHER -->
+      <div class="glass p-6 rounded-2xl rust-shadow">
+        <h3 class="font-bold mb-4 text-[#3b2a14]">🌤 Sky Over Farm</h3>
+        <p class="text-4xl font-bold">30°C</p>
+        <p class="text-gray-600 mb-4">Clear sunny field</p>
+
+        <div class="text-sm space-y-1">
+          <p>💧 Humidity: 70%</p>
+          <p>🌧 Rain: Tomorrow</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

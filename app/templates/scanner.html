@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Crop Scanner - AgriYu Farm</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+  background: #f5f7f2;
+}
+
+/* smoother card */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+</style>
+</head>
+
+<body class="p-6">
+
+<!-- 🔙 BACK BUTTON -->
+<a href="{{ url_for('main.dashboard') }}"
+   class="fixed top-5 left-5 bg-gray-900 text-white px-5 py-2 rounded-full shadow-md hover:bg-black transition">
+   ⬅ Dashboard
+</a>
+
+<div class="max-w-5xl mx-auto">
+
+  <!-- HEADER -->
+  <div class="mb-8">
+    <h1 class="text-4xl font-bold">📸 Crop Scanner</h1>
+    <p class="text-gray-500 mt-1">Upload crop images for AI disease detection 🌱</p>
+  </div>
+
+  <!-- FLASH -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="mb-4 p-3 rounded-lg text-sm font-medium
+          {{ 'bg-red-100 text-red-700' if category == 'error' else 'bg-green-100 text-green-700' }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- GRID LAYOUT -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- 📤 UPLOAD -->
+    <div class="card">
+      <h2 class="text-xl font-semibold mb-4">Upload Image</h2>
+
+      <form method="POST" enctype="multipart/form-data">
+        <input type="file"
+               name="image"
+               accept="image/*"
+               class="w-full p-3 border rounded-lg mb-4"
+               required>
+
+        <button type="submit"
+                class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition">
+          📤 Scan Crop
+        </button>
+      </form>
+    </div>
+
+    <!-- 🔍 RESULT -->
+    <div class="card">
+      <h2 class="text-xl font-semibold mb-4">Scan Result</h2>
+
+      {% if result %}
+
+        <div class="mb-3">
+          <p class="text-2xl font-bold text-green-700">
+            {{ result.status }}
+          </p>
+
+          <p class="text-gray-600 mt-1">
+            Confidence: <strong>{{ result.confidence }}</strong>
+          </p>
+        </div>
+
+        <p class="text-gray-500 text-sm">
+          {{ result.message }}
+        </p>
+
+        {% if image_file %}
+          <img src="{{ url_for('static', filename='uploads/' + image_file) }}"
+               class="mt-4 w-full h-64 object-cover rounded-lg">
+        {% endif %}
+
+      {% else %}
+        <p class="text-gray-400">
+          Upload an image to analyze crop health.
+        </p>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- 🖼 GALLERY -->
+  <div class="card mt-8">
+    <h2 class="text-xl font-semibold mb-4">Scan History</h2>
+
+    {% if scanned_images and scanned_images|length > 0 %}
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+        {% for img in scanned_images %}
+          <img src="{{ url_for('static', filename='uploads/' + img) }}"
+               class="w-full h-32 object-cover rounded-lg hover:scale-105 transition">
+        {% endfor %}
+
+      </div>
+
+    {% else %}
+      <p class="text-gray-400">No scanned images yet 🌱</p>
+    {% endif %}
+
+  </div>
+
+</div>
+
+</body>
+</html>

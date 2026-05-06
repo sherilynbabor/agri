@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AgriYu - Settings</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(255,255,255,0.6)),
+    url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6");
+
+  background-size: cover;
+  background-position: center;
+  transition: 0.3s;
+}
+
+
+body.dark {
+  background: #0f1410;
+  color: white;
+}
+
+
+.card {
+  width: 420px;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(12px);
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow: 0 15px 35px rgba(70, 50, 20, 0.15);
+}
+
+body.dark .card {
+  background: rgba(30, 35, 30, 0.9);
+}
+
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2d6a4f;
+}
+
+body.dark h2 {
+  color: #7CFF6B;
+}
+
+
+label {
+  font-size: 13px;
+  margin-top: 12px;
+  display: block;
+}
+
+
+select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  margin-top: 5px;
+}
+
+body.dark select {
+  background: #1c1f1c;
+  color: white;
+  border: 1px solid #444;
+}
+
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  background: linear-gradient(135deg, #2d6a4f, #40916c);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+
+.back {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  color: #2d6a4f;
+  text-decoration: none;
+}
+
+body.dark .back {
+  color: #7CFF6B;
+}
+
+
+.flash {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.flash.success { background: #d8f3dc; }
+.flash.error { background: #ffd6d6; }
+
+body.dark .flash.success { background: #1f3d2a; }
+body.dark .flash.error { background: #3d1f1f; }
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <h2>⚙️ Farm Settings</h2>
+
+  
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  
+  <form method="POST" action="{{ url_for('main.settings') }}">
+
+    <label>🌗 Theme</label>
+    <select name="theme" id="theme">
+      <option value="light" {% if theme == 'light' %}selected{% endif %}>Light Farm</option>
+      <option value="dark" {% if theme == 'dark' %}selected{% endif %}>Night Farm</option>
+    </select>
+
+    <label>🔔 Notifications</label>
+    <select name="notifications" id="notifications">
+      <option value="on" {% if notifications == 'on' %}selected{% endif %}>On</option>
+      <option value="off" {% if notifications == 'off' %}selected{% endif %}>Off</option>
+    </select>
+
+    <button type="submit">🌿 Save Settings</button>
+  </form>
+
+  <a class="back" href="{{ url_for('main.dashboard') }}">
+    ⬅ Back to Dashboard
+  </a>
+
+</div>
+
+<script>
+
+function applyTheme(theme) {
+  document.body.classList.toggle("dark", theme === "dark");
+}
+
+
+window.onload = function () {
+  const flaskTheme = "{{ theme }}";
+  const flaskNotif = "{{ notifications }}";
+
+  const theme = flaskTheme || localStorage.getItem("theme") || "light";
+  const notifications = flaskNotif || localStorage.getItem("notifications") || "on";
+
+  document.getElementById("theme").value = theme;
+  document.getElementById("notifications").value = notifications;
+
+  applyTheme(theme);
+};
+
+
+document.querySelector("form").onsubmit = function () {
+  const theme = document.getElementById("theme").value;
+  const notifications = document.getElementById("notifications").value;
+
+  localStorage.setItem("theme", theme);
+  localStorage.setItem("notifications", notifications);
+
+  applyTheme(theme);
+
+  return true;
+};
+</script>
+
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fields - AgriYu Farm</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+  background: linear-gradient(to bottom, #f5f7f2, #e8f0e5);
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  transition: 0.25s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+</style>
+</head>
+
+<body class="p-6">
+
+<!-- 🔙 BACK -->
+<a href="{{ url_for('main.dashboard') }}"
+   class="fixed top-5 left-5 bg-gray-900 text-white px-5 py-2 rounded-full shadow hover:bg-black">
+   ⬅ Dashboard
+</a>
+
+<div class="max-w-6xl mx-auto">
+
+  <!-- HEADER -->
+  <div class="mb-10 text-center">
+    <h1 class="text-4xl font-bold">🌱 Your Fields</h1>
+    <p class="text-gray-500 mt-2">Manage and monitor your crops</p>
+  </div>
+
+  {% if crops and crops|length > 0 %}
+
+  <!-- GRID -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    {% for crop in crops %}
+    <div class="card">
+
+      <!-- IMAGE -->
+      {% if crop.image %}
+        <img src="{{ url_for('static', filename='uploads/' + crop.image) }}"
+             class="w-full h-40 object-cover rounded-lg mb-3">
+      {% else %}
+        <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded-lg mb-3">
+          🌾 No Image
+        </div>
+      {% endif %}
+
+      <!-- INFO -->
+      <h3 class="text-lg font-bold">🌱 {{ crop.name }}</h3>
+      <p class="text-sm text-gray-600">{{ crop.growth_stage }}</p>
+
+      <!-- PROGRESS -->
+      <div class="mt-2">
+        <div class="bg-gray-200 h-3 rounded-full">
+          <div class="bg-green-600 h-3 rounded-full"
+               style="width: {{ crop.progress }}%">
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 mt-1">
+          {{ crop.progress }}% growth
+        </p>
+      </div>
+
+      <!-- REMAINING -->
+      <p class="text-sm text-gray-500 mt-2">
+        ⏳ {{ crop.remaining_days }} days remaining
+      </p>
+
+      <!-- 🤖 AI STATUS -->
+      {% if crop.disease %}
+        <div class="mt-3 p-2 rounded-lg
+          {% if 'Healthy' in crop.disease %}
+            bg-green-100 text-green-700
+          {% else %}
+            bg-red-100 text-red-700
+          {% endif %}">
+          
+          <p class="text-sm font-semibold">
+            {{ crop.disease }}
+          </p>
+
+          {% if crop.confidence %}
+            <p class="text-xs">
+              Confidence: {{ (crop.confidence * 100) | round(2) }}%
+            </p>
+          {% endif %}
+        </div>
+      {% else %}
+        <p class="text-xs text-gray-400 mt-3">
+          No scan data yet 📸
+        </p>
+      {% endif %}
+
+    </div>
+    {% endfor %}
+
+  </div>
+
+  {% else %}
+
+  <!-- EMPTY STATE -->
+  <div class="text-center mt-20">
+    <h2 class="text-2xl font-semibold text-gray-600">No crops yet 🌱</h2>
+    <p class="text-gray-400 mt-2">Start by adding crops in your dashboard</p>
+  </div>
+
+  {% endif %}
+
+</div>
+
+</body>
+</html>

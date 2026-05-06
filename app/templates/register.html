@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgriYu - Register</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+}
+
+/* 🌾 LEFT FARM PANEL */
+.left {
+  flex: 1.3;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.65)),
+    url("https://images.unsplash.com/photo-1523348837708-15d4a09cfac2") center/cover;
+
+  color: white;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.logo {
+  font-size: 30px;
+  font-weight: 800;
+  margin-bottom: 35px;
+}
+
+.logo span { color: #7CFF6B; }
+
+.left h1 {
+  font-size: 50px;
+  line-height: 1.1;
+}
+
+.left p {
+  margin-top: 15px;
+  opacity: 0.9;
+  max-width: 350px;
+}
+
+/* 🌿 RIGHT PANEL */
+.right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to bottom, #f5f7f6, #eaf3ea);
+}
+
+/* 🌾 GLASS CARD (MATCHES DASHBOARD) */
+.card {
+  width: 420px;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(12px);
+  padding: 35px;
+  border-radius: 18px;
+  box-shadow: 0 15px 35px rgba(70, 50, 20, 0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+/* TITLE */
+.card h2 {
+  margin-bottom: 5px;
+  color: #2f2a20;
+}
+
+.card p {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 20px;
+}
+
+/* FLASH */
+.flash {
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.flash.error { background: #ffd6d6; color: #b00020; }
+.flash.success { background: #d8f3dc; color: #1b4332; }
+
+/* INPUT */
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  transition: 0.2s;
+}
+
+input:focus {
+  border-color: #2e7d32;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(46,125,50,0.15);
+}
+
+/* BUTTON */
+button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+/* LOGIN LINK */
+.login {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 13px;
+}
+
+.login a {
+  color: #2e7d32;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* small helper */
+small {
+  display: block;
+  margin-top: -8px;
+  margin-bottom: 10px;
+  font-size: 11px;
+  color: #6c757d;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🌾 LEFT FARM PANEL -->
+<div class="left">
+  <div class="logo">🚜 Agri<span>Yu</span></div>
+
+  <h1>Start Your<br>Farm Journey</h1>
+
+  <p>
+    Join AgriYu and manage crops, monitor fields, and grow smarter with AI-powered farming tools.
+  </p>
+</div>
+
+<!-- 🌿 REGISTER PANEL -->
+<div class="right">
+  <div class="card">
+
+    <h2>Create Account 🌱</h2>
+    <p>Join the smart farming community</p>
+
+    <!-- FLASH -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- FORM -->
+    <form method="POST" action="{{ url_for('main.register') }}" onsubmit="return validateForm()">
+
+      <input type="text" name="username" placeholder="🌱 Username" required>
+
+      <input type="password" id="password" name="password" placeholder="🔒 Password" required>
+
+      <input type="password" id="confirm" name="confirm" placeholder="🔒 Confirm Password" required>
+
+      <small>Make sure your password is strong 🌾</small>
+
+      <button type="submit">Create Farm Account</button>
+
+    </form>
+
+    <div class="login">
+      Already a farmer?
+      <a href="{{ url_for('main.login') }}">Login</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function validateForm() {
+  const pass = document.getElementById("password").value;
+  const confirm = document.getElementById("confirm").value;
+
+  if (pass !== confirm) {
+    alert("Passwords do not match!");
+    return false;
+  }
+
+  if (pass.length < 6) {
+    alert("Password must be at least 6 characters!");
+    return false;
+  }
+
+  return true;
+}
+</script>
+
+</body>
+</html>
